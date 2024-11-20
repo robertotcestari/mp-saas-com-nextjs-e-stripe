@@ -15,10 +15,12 @@ import Link from 'next/link';
 import logo from './assets/logo.svg';
 import womanImg from './assets/woman.svg';
 import { auth } from '@/auth';
+import { fetchSubscriptionByEmail } from '@/lib/stripe';
 
 export default async function Home() {
   const session = await auth();
-  const userName = session?.user?.name ?? '';
+  const userEmail = session?.user?.email as string;
+  const subscription = await fetchSubscriptionByEmail(userEmail);
 
   return (
     <main>
@@ -126,19 +128,24 @@ export default async function Home() {
           <PricingCard />
         </div>
       </section>
-      <section className="bg-white md:py-16 py-10 text-center">
-        <h2 className="md:text-6xl text-2xl font-bold md:mt-16">
-          Pronto Para Mudar Sua Vida?
-        </h2>
-        <p className="text-gray-500 mt-4 text-sm md:text-xl max-w-3xl mx-auto">
-          Faça como milhares de outras pessoas. Assine nosso produto e tenha
-          garantido seus estudos{' '}
-        </p>
-        <Button className="mt-14 w-96">Assine Agora</Button>
-        <p className="text-xs text-muted-foreground mt-2">
-          Comece sua assinatura agora mesmo. Cancele quando quiser.{' '}
-        </p>
-        <footer className="mt-16 border-t border-gray-300 pt-10">
+      <section className="bg-white text-center">
+        {!subscription && (
+          <div className="md:py-16 py-10">
+            <h2 className="md:text-6xl text-2xl font-bold md:mt-16">
+              Pronto Para Mudar Sua Vida?
+            </h2>
+            <p className="text-gray-500 mt-4 text-sm md:text-xl max-w-3xl mx-auto">
+              Faça como milhares de outras pessoas. Assine nosso produto e tenha
+              garantido seus estudos{' '}
+            </p>
+            <Button className="mt-14 w-96">Assine Agora</Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              Comece sua assinatura agora mesmo. Cancele quando quiser.{' '}
+            </p>
+          </div>
+        )}
+
+        <footer className=" border-t border-gray-300 p-10">
           <Image src={logo} alt="Logotipo" className="mx-auto" />
           <p className="text-muted-foreground">
             © 2024 LivroSaaS. Todos os direitos reservados.
